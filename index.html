@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <style>
+      * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background-color: #1d0101;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      
+    }
+
+    img {
+      max-width: 60%;
+      margin-bottom: 20px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    div {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-size: 14px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      border-radius: 25px;
+    }
+    
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      color: white;
+      background: #ff5733;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+      border-radius: 25px;
+    }
+
+    button:hover {
+      background: #ff2e00;
+    }
+   
+    .btn-div {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .btn-div a {
+      text-decoration: none;
+    }
+
+    .btn-div button {
+      margin-bottom: 10px;
+      border-radius: 25px;
+    }
+    .profile-img{
+      min-width: 100%;
+      border-radius: 25px;
+    }
+    </style>
+    <!-- Include Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDqJm1dNjmhotNNNSzQC0BvkaJFvTlu6OQ",
+        authDomain: "rocky-rr.firebaseapp.com",
+        projectId: "rocky-rr",
+        storageBucket: "rocky-rr.firebasestorage.app",
+        messagingSenderId: "1085664159521",
+        appId: "1:1085664159521:web:314ab0854d847c7330c060",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("loginBtn").addEventListener("click", () => {
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              // Redirect to main.html upon successful login
+              window.location.href = "main.html";
+            })
+            .catch((error) => {
+              alert("Error: " + error.message);
+            });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <img src="./logo.jpeg" alt="" />
+    <div>
+      <main>
+      <label for="gamename"> Enter Game Name: </label>
+      <select id="gamename">
+        <option value="">Select a game</option>
+        <option
+          value="https://damanclub.in/#/register?invitationCode=257453775317"
+        >
+          DAMAN
+        </option>
+        <option
+          value="https://www.bswin44.in/#/register?invitationCode=76511245451"
+        >
+          BS WIN
+        </option>
+        <option
+          value="https://51gameappinin.com/#/register?invitationCode=68147490681"
+        >
+          51 GAME
+        </option>
+        <option
+          value="https://www.insnake.in/#/register?invitationCode=65632150810"
+        >
+          IN99
+        </option>
+        <option
+          value="https://www.bigmumbaiw.com/#/register?invitationCode=86684148669"
+        >
+          BIG MUMBAI
+        </option>
+        <option
+          value="http://bing002.com/#/register?invitationCode=453176794369"
+        >
+          GOA GAME
+        </option>
+        <option
+          value="https://www.tirangaclub.net/#/register?invitationCode=435622534208"
+        >
+          TIRANGA
+        </option>
+        <option
+          value="https://sikkim999.com/#/register?invitationCode=47277129787"
+        >
+          SIKKIM
+        </option>
+        <option
+          value="https://bharatclub.bet/#/register?invitationCode=26868966761"
+        >
+          BHARAT CLUB
+        </option>
+        <option
+          value="https://www.6diuwin.com/#/register?invitationCode=58884986277"
+        >
+          DIUWIN
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label for="register"> Register: </label>
+      <a id="registerLink" href="#" target="_blank"
+        ><button class="lbox">Click here</button></a
+      >
+    </div>
+    <div>
+      <label for="email">
+        User Name:
+        <input type="text" id="email" placeholder="Enter your email" />
+      </label>
+    </div>
+
+    <div>
+      <label for="password">
+        Enter Key:
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter your password"
+        />
+      </label>
+    </div>
+
+  </main>
+
+    <div class="btn-div">
+      <button id="loginBtn">LOGIN</button>
+      <a target="_blank" href="https://t.me/paFigroup12">
+        <button>Get Key</button>
+      </a>
+    </div>
+    <a target="_blank" href="https://t.me/ZAIG_official_daman">
+      <img class="profile-img" src="./profile.jpeg" alt="Profile"></a>
+    <script>
+      document
+        .getElementById("gamename")
+        .addEventListener("change", function () {
+          const selectedGame = this.value;
+          const registerLink = document.getElementById("registerLink");
+
+          if (selectedGame) {
+            registerLink.href = selectedGame;
+          } else {
+            registerLink.href = "#";
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number Prediction System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      /* Base Styles */
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        overflow: scroll;
+        transition: background 0.5s ease;
+      }
+
+      h2,
+      h3 {
+        color: #ffd700;
+      }
+
+      /* Login Page */
+      #loginPage {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        color: #fff;
+      }
+
+      .login-content {
+        text-align: center;
+        animation: fadeIn 1.5s ease;
+      }
+
+      .login-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #ffd700;
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      }
+
+      .telegram-link {
+        display: inline-block;
+        padding: 15px 30px;
+        background: #0088cc;
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        animation: pulse 2s infinite;
+      }
+
+      #winLossChart {
+        max-width: 70vw;
+        max-height: 70vh;
+      }
+
+      .telegram-link:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 25px rgba(0, 136, 204, 0.5);
+      }
+
+      /* Prediction Page */
+      #predictionPage {
+        display: none;
+        padding: 2rem;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+      }
+
+      /* Number Grid */
+      .number-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 50px);
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .number-box {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50%;
+        border: 3px solid;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        animation: glow 2s infinite alternate;
+      }
+
+      .violet-box {
+        border-color: #9400d3;
+        color: #9400d3;
+      }
+      .green-box {
+        border-color: #00ff00;
+        color: #00ff00;
+      }
+      .red-box {
+        border-color: #ff0000;
+        color: #ff0000;
+      }
+
+      .number-box:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px currentColor;
+      }
+
+      /* Input Section */
+      #numberInput {
+        padding: 10px 15px;
+        font-size: 1rem;
+        border: 2px solid #00ff9d;
+        border-radius: 20px;
+        margin-right: 10px;
+        width: 200px;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+      }
+
+      #predictButton {
+        padding: 10px 20px;
+        font-size: 1rem;
+        background: #00ff9d;
+        color: #1a1a2e;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+      }
+
+      #predictButton:hover {
+        background: #00cc7a;
+        box-shadow: 0 0 25px rgba(0, 255, 157, 0.5);
+      }
+
+      /* Results Display */
+      #predictionResult {
+        font-size: 1.5rem;
+        color: #ffd700;
+        display: inline-block;
+        padding: 0 15px;
+      }
+
+      /* History Section */
+      #historyList {
+        list-style: none;
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        max-height: 200px; /* Height for 5 items */
+        overflow-y: hidden; /* Hide scrollbar initially */
+      }
+      #historyList::-webkit-scrollbar {
+        display: none;
+      }
+
+      #historyList.scroll-enabled {
+        overflow-y: auto; /* Enable scrollbar when history exceeds 5 items */
+      }
+
+      #historyList li {
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+        border-radius: 5px;
+        animation: slideIn 0.5s ease;
+      }
+
+      .win {
+        background-color: #00ff00;
+        color: #1a1a2e;
+      }
+      .lose {
+        background-color: #ff0000;
+        color: white;
+      }
+
+      /* Full-screen win/loss display */
+      .full-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        animation: fadeOut 1.5s ease;
+      }
+
+      .win-screen {
+        background: rgba(0, 255, 0, 0.8);
+      }
+      .lose-screen {
+        background: rgba(255, 0, 0, 0.8);
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* Animations */
+      @keyframes glow {
+        0% {
+          box-shadow: 0 0 5px currentColor;
+        }
+        100% {
+          box-shadow: 0 0 20px currentColor;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Page -->
+    <div id="loginPage">
+      <div class="login-content">
+        <h1>WELCOME TO ROCKY RR</h1>
+        <a
+          href="https://t.me/paFigroup12"
+          target="_blank"
+          class="telegram-link"
+          onclick="openTelegram(event)"
+        >
+          JOIN NOW
+        </a>
+      </div>
+    </div>
+
+    <!-- Prediction Page -->
+    <div id="predictionPage">
+      <h2>Number Prediction System</h2>
+
+      <h3>Select the actual result:</h3>
+      <div class="number-grid" id="actualResultSelection"></div>
+
+      <input
+        type="text"
+        id="numberInput"
+        placeholder="Enter 17-digit Number"
+        maxlength="17"
+      />
+      <button onclick=" predict() " id="predictButton">Predict</button>
+
+      <h3>Prediction: <span id="predictionResult">-</span></h3>
+
+      <h3>Prediction History (Last 5 Visible)</h3>
+      <ul id="historyList"></ul>
+
+      <h3>Win/Loss Chart</h3>
+      <center>
+        <canvas id="winLossChart"></canvas>
+      </center>
+
+      <!-- Full-screen win/loss display -->
+      <div
+        id="fullScreenDisplay"
+        class="full-screen"
+        style="display: none"
+      ></div>
+    </div>
+
+    <script>
+      // System State
+      let history = [];
+      let winLossData = { win: 0, lose: 0 };
+      let lastPredictions = [];
+      let patternTracker = {};
+      let lastFourDigits = null; // Track the last 4 digits of the first input
+
+      // Page Transition Handling
+      function openTelegram(event) {
+        event.preventDefault();
+        const telegramWindow = window.open(
+          "https://t.me/paFigroup12",
+          "_blank"
+        );
+
+        const checkWindow = setInterval(() => {
+          if (telegramWindow.closed) {
+            clearInterval(checkWindow);
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("predictionPage").style.display = "block";
+            initializePredictionPage();
+          }
+        }, 500);
+      }
+
+      // Initialize Prediction Page
+      function initializePredictionPage() {
+        generateNumberGrid();
+        new Chart(document.getElementById("winLossChart").getContext("2d"), {
+          type: "doughnut",
+          data: {
+            labels: ["Wins", "Losses"],
+            datasets: [
+              {
+                data: [0, 0],
+                backgroundColor: ["#00ff00", "#ff0000"],
+                hoverOffset: 4,
+              },
+            ],
+          },
+        });
+      }
+
+      // Number Grid Generation
+      function generateNumberGrid() {
+        const grid = document.getElementById("actualResultSelection");
+        grid.innerHTML = "";
+
+        const numberConfig = [
+          { num: 0, class: "violet-box" },
+          { num: 1, class: "green-box" },
+          { num: 2, class: "red-box" },
+          { num: 3, class: "green-box" },
+          { num: 4, class: "red-box" },
+          { num: 5, class: "violet-box" },
+          { num: 6, class: "red-box" },
+          { num: 7, class: "green-box" },
+          { num: 8, class: "red-box" },
+          { num: 9, class: "green-box" },
+        ];
+
+        numberConfig.forEach((config) => {
+          const box = document.createElement("div");
+          box.className = `number-box ${config.class}`;
+          box.textContent = config.num;
+          box.onclick = () => recordResult(config.num);
+          grid.appendChild(box);
+        });
+      }
+
+      // Core Prediction Logic
+      function predict() {
+        if (history.length > 0 && history[0].actual === null) {
+          alert(
+            "Please enter the actual result for the previous prediction first!"
+          );
+          return;
+        }
+
+        // Validate input
+        let inputVal = document.getElementById("numberInput").value;
+        if (inputVal.length !== 17 || isNaN(inputVal)) {
+          alert("Please enter a valid 17-digit number!");
+          return;
+        }
+
+        // Extract last 4 digits
+        let currentLastFour = inputVal.slice(-4);
+
+        // Check if this is the first input
+        if (lastFourDigits === null) {
+          lastFourDigits = currentLastFour; // Set the initial last 4 digits
+        } else {
+          // Check if the last 4 digits are sequential
+          let expectedLastFour = String(Number(lastFourDigits) + 1).padStart(
+            4,
+            "0"
+          );
+          if (currentLastFour !== expectedLastFour) {
+            alert(`Invalid last 4 digits! Expected: ${expectedLastFour}`);
+            return;
+          }
+          lastFourDigits = currentLastFour; // Update the last 4 digits
+        }
+
+        // Generate and display prediction
+        let prediction = generatePrediction();
+        document.getElementById("predictionResult").innerText = prediction;
+
+        // Add to history (most recent at the top)
+        let entry = {
+          number: inputVal,
+          prediction: prediction,
+          actual: null,
+        };
+        history.unshift(entry); // Add to the beginning of the array
+        lastPredictions.push(prediction);
+        if (lastPredictions.length > 5) lastPredictions.shift();
+
+        updateHistory();
+      }
+
+      function generatePrediction() {
+        if (history.length === 0) {
+          // First prediction, return random number
+          return Math.floor(Math.random() * 10);
+        }
+
+        // Get last 5 actual results
+        let lastResults = history.slice(0, 5).filter((h) => h.actual !== null);
+
+        if (lastResults.length === 0) {
+          // No actual results yet, return random number
+          return Math.floor(Math.random() * 10);
+        }
+
+        // Track patterns
+        let lastPattern = lastResults.map((h) => h.actual).join("");
+        patternTracker[lastPattern] = (patternTracker[lastPattern] || 0) + 1;
+
+        // Calculate frequency of small (0-4) and big (5-9) numbers
+        let smallCount = lastResults.filter((h) => h.actual < 5).length;
+        let bigCount = lastResults.filter((h) => h.actual >= 5).length;
+
+        // Generate prediction based on frequency and patterns
+        let prediction;
+        if (smallCount > bigCount) {
+          // More small numbers, predict small
+          prediction = Math.floor(Math.random() * 5);
+        } else if (bigCount > smallCount) {
+          // More big numbers, predict big
+          prediction = Math.floor(Math.random() * 5) + 5;
+        } else {
+          // Equal count, predict random
+          prediction = Math.floor(Math.random() * 10);
+        }
+
+        // Ensure prediction is unique in last 5 predictions
+        while (lastPredictions.includes(prediction)) {
+          prediction = (prediction + 1) % 10;
+        }
+
+        return prediction;
+      }
+
+      // Result Recording
+      function recordResult(actualNumber) {
+        if (history.length === 0) return;
+
+        let lastEntry = history[0];
+        lastEntry.actual = actualNumber;
+
+        if (
+          (lastEntry.prediction < 5 && actualNumber < 5) ||
+          (lastEntry.prediction >= 5 && actualNumber >= 5)
+        ) {
+          winLossData.win++;
+          lastEntry.status = "Win";
+          showFullScreenDisplay("win");
+        } else {
+          winLossData.lose++;
+          lastEntry.status = "Lose";
+          showFullScreenDisplay("lose");
+        }
+
+        updateHistory();
+        updateChart();
+      }
+
+      // Show full-screen win/loss display
+      function showFullScreenDisplay(type) {
+        const display = document.getElementById("fullScreenDisplay");
+        display.className = `full-screen ${type}-screen`;
+        display.style.display = "block";
+
+        setTimeout(() => {
+          display.style.display = "none";
+        }, 1500); // Changed from 1500 to 2500 for 2.5 seconds
+      }
+
+      // Update History Display
+      function updateHistory() {
+        let historyList = document.getElementById("historyList");
+        historyList.innerHTML = "";
+
+        // Add all history items
+        history.forEach((entry, index) => {
+          let statusClass = entry.status === "Win" ? "win" : "lose";
+          let statusText = entry.status
+            ? `<span class="${statusClass}">(${entry.status})</span>`
+            : "(Pending)";
+          let listItem = document.createElement("li");
+          listItem.innerHTML = `${entry.number} → Predicted: ${entry.prediction} ${statusText}`;
+          historyList.appendChild(listItem);
+        });
+
+        // Enable scroll if history exceeds 5 items
+        if (history.length > 5) {
+          historyList.classList.add("scroll-enabled");
+        } else {
+          historyList.classList.remove("scroll-enabled");
+        }
+      }
+
+      // Update Chart
+      function updateChart() {
+        const chart = Chart.getChart("winLossChart");
+        chart.data.datasets[0].data = [winLossData.win, winLossData.lose];
+        chart.update();
+      }
+
+      // Initialize the system
+      generateNumberGrid();
+    </script>
+  </body>
+</html>
